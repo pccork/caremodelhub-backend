@@ -2,10 +2,11 @@
  * Central database abstraction.
  * This allows swap MongoDB later between local and online*/
 import { connectMongo } from "./mongo/connect.js";
+import type { userStore } from "./mongo/user-store.js";
 
 export type Db = {
   // Stores will be attached here later
-  userStore: any;
+  userStore: typeof userStore | null;
   resultStore: any;
 };
 
