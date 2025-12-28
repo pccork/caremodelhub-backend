@@ -17,7 +17,7 @@ async function createAdmin() {
 
   await mongoose.connect(uri);
 
-  const adminEmail = "admin@caremodelhub.local";
+  const adminEmail = "admin@caremodelhub.com";
   const adminPassword = "AdminPass123!"; // change after first login
 
   // Check if an admin already exists

@@ -7,8 +7,11 @@
  */
 
 import Hapi from "@hapi/hapi";
+import Jwt from "@hapi/jwt";
+import { validateJwt } from "./api/jwt-utils.js";
 import dotenv from "dotenv";
 import { connectDb } from "./models/db.js";
+import { apiRoutes } from "./api-routes.js";
 // Load variables from .env into process.env
 dotenv.config();
 
@@ -30,6 +33,27 @@ async function startServer() {
   // Connect to database
   connectDb("mongo");
 
+  /* ===============================
+     AUTHENTICATION (JWT)
+     =============================== */
+  await server.register(Jwt);
+
+  server.auth.strategy("jwt", "jwt", {
+    keys: process.env.JWT_SECRET,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      exp: true,
+    },
+    validate: validateJwt,
+  });
+
+  // JWT is required by default for all routes
+  server.auth.default("jwt");
+
+  
+  
   /**
    * Basic health check route
    * Verify the server is running
@@ -40,15 +64,14 @@ async function startServer() {
     options: {
       auth: false, // no auth required
     },
-    handler: async () => {
-      return {
-        status: "ok",
-        service: "caremodelhub-backend",
-        timestamp: new Date().toISOString(),
-      };
-    },
+   handler: async () => ({
+      status: "ok",
+      service: "caremodelhub-backend",
+      timestamp: new Date().toISOString(),
+    }),
+    
   });
-
+  server.route(apiRoutes);
   // Start the server
   await server.start();
 
