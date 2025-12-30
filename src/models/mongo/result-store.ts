@@ -1,12 +1,18 @@
 import { ResultMongoose } from "./result.js";
 
+export type CreateResultInput = {
+  userId: string;
+  mrn: string;
+  specimenNo: string;
+  inputs: any;
+  outputs: any;
+  model: string;
+  modelVersion: string;
+};
+
 export const resultStore = {
-  async create(userId: string, inputs: any, outputs: any) {
-    return ResultMongoose.create({
-      userId,
-      inputs,
-      outputs,
-    });
+  async create(data: CreateResultInput) {
+    return ResultMongoose.create(data);
   },
 
   async findByUser(userId: string) {

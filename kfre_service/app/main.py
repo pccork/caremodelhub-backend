@@ -1,7 +1,7 @@
 import uuid
 from fastapi import FastAPI, Header, HTTPException
 from .schemas import KFREInput, KFREOutput
-from .kfre import calculate_kfre_5yr, MODEL_NAME, MODEL_VERSION
+from .kfre import calculate_kfre_5y, MODEL_NAME, MODEL_VERSION
 from .audit import audit
 
 app = FastAPI(
@@ -34,7 +34,7 @@ def calculate(
     })
 
     try:
-        risk_5y = calculate_kfre_5yr(
+        risk_5y = calculate_kfre_5y(
             payload.age,
             payload.sex,
             payload.egfr,

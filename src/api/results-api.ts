@@ -4,6 +4,7 @@ import Joi from "joi";
 import { db } from "../models/db.js";
 import { capabilities } from "../auth/capabilities.js";
 import { hasCapability } from "../auth/authorise.js";
+import { calculateKfre } from "../services/kfre-client.js";
 
 export const resultsApi: {
   create: Pick<ServerRoute, "options" | "handler">;
@@ -18,32 +19,49 @@ export const resultsApi: {
       auth: { scope: ["user"] },// only users reach handler
       validate: {
         payload: Joi.object({
-          inputs: Joi.object().required(), // KFRE inputs (age, eGFR, ACR,gender )
-        }).required(),
+          mrn: Joi.string()
+            .trim()
+            .max(32)
+            .required(),
+
+          specimenNo: Joi.string()
+            .trim()
+            .max(32)
+            .required(),
+
+          inputs: Joi.object({
+            age: Joi.number().integer().min(18).max(110).required(),
+            sex: Joi.string().valid("male", "female").required(),
+            egfr: Joi.number().min(1).max(200).required(),
+            acr: Joi.number().positive().required(),
+          }).required(),
+        }),
       },
     },
 
     handler: async (request: any, h: any) => {
       const { userId, role } = request.auth.credentials;
-
+      // RBAC check
       if (!hasCapability(role, capabilities.RESULTS_CREATE)) {
         throw Boom.forbidden("Not allowed to create results");
       }
 
-      // Mock output (Python will replace this later)
-      const outputs = {
-        kfreRisk: 12.3,
-        unit: "%",
-        interpretation: "Mock result (Python integration pending)",
-      };
+      const { mrn, specimenNo, inputs } = request.payload;
+
+      // const kfreResult = await calculateKfre(inputs);
+      const kfreResult = await calculateKfre(inputs);
 
       /**Persist result with ownership*/
 
-      const result = await db.resultStore?.create(
+      const result = await db.resultStore?.create({
         userId,
-        request.payload.inputs,
-        outputs
-      );
+        mrn: request.payload.mrn,
+        specimenNo: request.payload.specimenNo,
+        inputs: request.payload.inputs,
+        outputs: { kfre: kfreResult },
+        model: kfreResult.model,
+        modelVersion: kfreResult.model_version,
+      });
 
       return h.response(result).code(201);
     },

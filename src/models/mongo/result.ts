@@ -8,6 +8,24 @@ const resultSchema = new mongoose.Schema(
       index: true,
       ref: "User",
     },
+    
+    // patient identifier (backend only)
+    mrn: {
+      type: String,
+      required: true,
+      index: true,
+      trim: true,
+    },
+
+    // laboratory specimen identifier
+    specimenNo: {
+      type: String,
+      required: true,
+      index: true,
+      trim: true,
+    },
+
+
 
     inputs: {
       type: Object,
