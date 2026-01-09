@@ -4,6 +4,9 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Pytest cache
+.pytest_cache/
+
 # Virtual environments
 .venv/
 venv/
@@ -19,3 +22,6 @@ dist/
 
 # Logs
 npm-debug.log*
+
+# OS files
+.DS_Store

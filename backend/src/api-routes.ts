@@ -9,7 +9,7 @@ export const apiRoutes: ServerRoute[] = [
   },
 
   {
-    method: "GET",path: "/api/me",
+    method: "GET",path: "/api/me", // return information (role) of current authenticated user
     options: {
       auth: {
         scope: ["user", "scientist", "admin"],

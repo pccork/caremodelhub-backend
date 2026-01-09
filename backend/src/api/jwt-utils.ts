@@ -7,14 +7,14 @@ type JwtPayload = {
 };
 
 /**
- * Hapi JWT validation function runs automatically on every protected request.
+ * To be imported - Hapi validation of JET (token) function runs automatically on every protected request.
  */
 export async function validateJwt(
-  artifacts: any,
+  artifacts: any, // A Hapi JWT object contains decoded headee, payload and raw token
   request: Request
 ) {
   const decoded = artifacts.decoded.payload as JwtPayload;
-  // Check user still exists in DB
+  // Check user still exists in DB with async wait
   const user = await db.userStore?.findById(decoded.id);
 
   if (!user) {
@@ -23,9 +23,9 @@ export async function validateJwt(
 
   return {
     isValid: true,
-    credentials: {
-      userId: user._id,
-      role: user.role,
+    credentials: { 
+      userId: user._id,  // who is the user
+      role: user.role,  // what rule or credentials
       scope: [user.role],
     },
   };

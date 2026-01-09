@@ -36,8 +36,8 @@ async function startServer() {
   /* ===============================
      AUTHENTICATION (JWT)
      =============================== */
-  await server.register(Jwt);
-
+  await server.register(Jwt); // register JWT with hapi/jwt plugin
+  // Set up a reusable authentication strategies name jwt 
   server.auth.strategy("jwt", "jwt", {
     keys: process.env.JWT_SECRET,
     verify: {
